@@ -102,18 +102,22 @@ world <- get_stamenmap(
     bbox = c(left = -180, bottom = -57, right = 179, top = 82.1), 
     maptype = "terrain",
     zoom = 2)
-Starbucks %>% 
-  mutate(Ownership = Ownership Type) %>% 
-  group_by(Ownership)
-#R doesn't like "type" in ownership type?
+Starbucks 
 
 ggmap(world) + 
   geom_point(data = Starbucks, 
-             aes(x = Longitude, y = Latitude), 
+             aes(x = Longitude, 
+                 y = Latitude, 
+                 color = `Ownership Type`), 
              alpha = .3, 
              size = .1) +
-  theme_map()
+  theme_map() + 
+  theme(legend.background = element_blank())
+  
+  
 ```
+
+*I can deduce from this that*
 
 
 
@@ -122,9 +126,9 @@ ggmap(world) +
 ```{r}
 
 world <- get_stamenmap(
-    bbox = c(left = -180, bottom = -57, right = 179, top = 82.1), 
+    bbox = c(left = -93.8649, bottom = 44.7162, right = -92.5877, top = 45.2243), 
     maptype = "terrain",
-    zoom = 2)
+    zoom = 10)
 
 ggmap(world) + 
   geom_point(data = Starbucks, 
@@ -138,18 +142,24 @@ ggmap(world) +
 
   3. In the Twin Cities plot, play with the zoom number. What does it do?  (just describe what it does - don't actually include more than one map).  
 
-```{r}
-
-
-
-```
+*Increasing the zoom number provides more detail for the area of the map that you've chosen. For example, in zoom 10, it showed the general major roadways in the Twin Cities area, but zoom 12 showed smaller roadways as well. With the increase in detail, the map takes a lot longer to load. On the other hand, decreasing the zoom number decreases the amount of detail in the map.*
 
 
   4. Try a couple different map types (see `get_stamenmap()` in help and look at `maptype`). Include a map with one of the other map types.  
 
 ```{r}
 
+world <- get_stamenmap(
+    bbox = c(left = -93.8649, bottom = 44.7162, right = -92.5877, top = 45.2243), 
+    maptype = "watercolor",
+    zoom = 10)
 
+ggmap(world) + 
+  geom_point(data = Starbucks, 
+             aes(x = Longitude, y = Latitude), 
+             alpha = .3, 
+             size = .1) +
+  theme_map()
 
 ```
 
@@ -158,6 +168,21 @@ ggmap(world) +
 
 ```{r}
 
+world <- get_stamenmap(
+    bbox = c(left = -93.8649, bottom = 44.7162, right = -92.5877, top = 45.2243), 
+    maptype = "terrain",
+    zoom = 10)
+
+TwinCities <- ggmap(world) + 
+  geom_point(data = Starbucks, 
+             aes(x = Longitude, y = Latitude), 
+             alpha = .3, 
+             size = 1) +
+  theme_map()
+
+TwinCities + 
+  annotate("text", x = -93.17, y = 44.92, label = "Macalester College", color = "blue", size = 3) +
+  annotate("point", x = -93.17, y = 44.93, color = "blue")
 
 
 ```
@@ -202,26 +227,49 @@ starbucks_with_2018_pop_est <-
 
 ```{r}
 
-favorite_places <- tibble(
-  place = c(), #names
-  long = c(), 
-  lat = c(), 
-  top3 = c("yes", "no", etc))
+#from office hours 
 
-    pal <- colorFactor("viridus", domain = favorite_places$top3)
+stephs_favs_DK <- tibble(
+  place = c("Konditaget Lüders", "Amalienborg Slotsplads", "The Little Mermaid", "Kultorvet", "Tivoli", "The Black Diamond", "I Am Queen Mary", "Dragør Fort", "Amagerstrand", "Kongens Have & Rosenborg Slot", "Sankt Peders Bageri", "Ny Carlsberg Glyptotek", "Reffen"), #names
+  lat = c(55.707, 55.68, 55.69, 55.6824, 55.673, 55.673, 55.686, 55.587 , 55.657,55.68, 55.679, 55.672, 55.693),
+  long = c(12.59, 12.593, 12.599, 12.5735, 12.553, 12.583, 12.597, 12.677, 12.648, 12.577, 12.569, 12.571, 12.609),
+  top3 = c("yes", "no", "no", "yes", "no", "no", "no", "no", "no", "no", "yes", "no", "no"))
+
+pal_favs <- colorFactor("viridis",
+                    domain = stephs_favs_DK$top3)
     
-leaflet(favorite_places) %>% 
-  addProviderfiles(providers%Carto08.DarkMatter) %>% 
-                   addCircles(lng = -long, 
-                              lat = -lat, 
-                              label = - place, 
-                              color = -pal(top_three), 
-                              opacity = 1, 
-                              weight = 10) %>% 
-                     addPolyLines(lng = -long, 
-                                  lat = -lat, 
-                                  color = col2hex("darkred")) %>% 
-                     addLegend(pal = pal, values ~top3)
+leaflet(stephs_favs_DK) %>% 
+  addProviderTiles(providers$CartoDB.Voyager) %>%
+  addCircles(lng = ~long,
+             lat = ~lat, 
+             label = ~place, 
+             color = ~pal_favs(top3),
+             opacity = 1, 
+             weight = 10)%>% 
+  addPolylines(lng = ~long,
+               lat = ~lat,
+               color = col2hex("darkred"))%>%
+  addLegend(pal = pal_favs, 
+            values = ~top3, 
+            opacity = 1)
+
+#errors: 
+# - Error in inherits(values, "formula") : argument "values" is missing, with no default
+# - path too long again 
+
+
+# MplsStops %>% 
+#   leaflet() %>% 
+#   addTiles() %>% 
+#   addCircles(lng = ~long, 
+#              lat = ~lat,
+#              weight = 1,
+#              opacity = 1, 
+#              color = ~pal_mpls(problem)) %>% 
+#   addLegend(position = c("topright"), 
+#             pal = pal_mpls, 
+#             values = ~problem, 
+#             opacity = 1)
 
 ```
 
@@ -252,11 +300,29 @@ Stations<-read_csv("http://www.macalester.edu/~dshuman1/data/112/DC-Stations.csv
   
 ```{r}
 
+covid19 %>% 
+  mutate(state = str_to_lower(state)) %>% 
+  group_by(state) %>% 
+  summarise(cases = max(cases)) %>% 
+  ggplot() + 
+  geom_map(map = states_map, 
+           aes(map_id = state.abbfill = cases)) +
+  expand_limits(x = states_map$long, y = states_map$lat) +
+  theme_map()
+
+# DC_map <- get_stamenmap(
+#   bbox = c(left = -77.31, bottom = 38.733, right = -76.73, top = 39.0539), 
+#   maptype = "terrain",
+#   zoom = 11)
+# )
+
 ```
   
   10. Only 14.4% of the trips in our data are carried out by casual users. Create a plot that shows which area(s) have stations with a much higher percentage of departures by casual users. What patterns do you notice? Also plot this on top of a map. I think it will be more clear what the patterns are.
   
 ```{r}
+
+
 
 ```
   
@@ -276,7 +342,19 @@ The following exercises will use the COVID-19 data from the NYT.
   
 ```{r}
 
+covid_cum <-
+  covid19 %>% 
+  mutate(new_state = str_to_lower(state)) %>% 
+  left_join(census_pop_est_2018, by = c("new_state" = "state")) %>% 
+  mutate(per10 = (cases/est_pop_2018)*10000)
 
+states_map <- map_data("state")
+
+covid_cum %>% 
+  ggplot()
+
+#change state name to lowercase
+#summarize covid data and then join
 
 ```  
   
@@ -291,7 +369,12 @@ These exercises use the datasets `MplsStops` and `MplsDemo` from the `carData` l
   
 ```{r}
 
-
+MplsStops %>% 
+  mutate(num_sus = problem %in% c("suspicious")) %>% 
+  group_by(neighborhood) %>% 
+  summarise(stopnumber = n(),
+            prop_sus = mean(num_sus)) %>% 
+  mutate(prop_suspicious = prop_sus)
 
 ```
   
@@ -300,7 +383,20 @@ These exercises use the datasets `MplsStops` and `MplsDemo` from the `carData` l
   
 ```{r}
 
+pal_mpls <- colorFactor("viridis", domain = MplsStops$problem)
 
+MplsStops %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addCircles(lng = ~long, 
+             lat = ~lat,
+             weight = 1,
+             opacity = 1, 
+             color = ~pal_mpls(problem)) %>% 
+  addLegend(position = c("topright"), 
+            pal = pal_mpls, 
+            values = ~problem, 
+            opacity = 1)
 
 ```
   
@@ -312,8 +408,57 @@ mpls_nbhd <- st_read("Minneapolis_Neighborhoods/Minneapolis_Neighborhoods.shp", 
 ```
 
   17. Use `leaflet` to create a map from the `mpls_all` data  that colors the neighborhoods by `prop_suspicious`. Display the neighborhood name as you scroll over it. Describe what you observe in the map.
-  
+
+```{r}
+
+pal_mpls2 <- colorFactor("viridis", domain = MplsStops$prop_suspicious)
+
+MplsProp <- MplsStops %>% 
+  mutate(num_sus = problem %in% c("suspicious")) %>% 
+  group_by(neighborhood) %>% 
+  summarise(stopnumber = n(),
+            prop_sus = mean(num_sus)) %>% 
+  mutate(prop_suspicious = prop_sus)
+
+MplsStops %>% 
+  left_join(MplsProp, by = c("neighborhood")) %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addCircles(lng = ~long, 
+             lat = ~lat,
+             weight = 1,
+             opacity = 1, 
+             color = ~pal_mpls(prop_suspicious)) %>% 
+  addLegend(position = c("topright"), 
+            pal = pal_mpls, 
+            values = ~prop_suspicious, 
+            opacity = 1)
+
+#work on her (,: )
+
+```
+
   18. Use `leaflet` to create a map of your own choosing. Come up with a question you want to try to answer and use the map to help answer that question. Describe what your map shows. 
+  
+```{r}
+
+pal_mpls <- colorFactor("viridis", domain = MplsStops$problem)
+
+MplsStops %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addCircles(lng = ~long, 
+             lat = ~lat,
+             weight = 1,
+             opacity = 1, 
+             color = ~pal_mpls(problem)) %>% 
+  addLegend(position = c("topright"), 
+            pal = pal_mpls, 
+            values = ~problem, 
+            opacity = 1)
+
+```
+  
   
   
 ## GitHub link
