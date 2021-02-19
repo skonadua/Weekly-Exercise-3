@@ -115,7 +115,8 @@ ggmap(world) +
              size = .1) +
   theme_map() + 
   theme(legend.background = element_blank()) +
-  labs(title = "Starbucks Locations in the World by Ownership Type")
+  labs(title = "Starbucks Locations in the World by Ownership Type") + 
+  theme(plot.title.position= "plot")
   
   
 ```
@@ -139,7 +140,8 @@ ggmap(world) +
              alpha = .3, 
              size = 3) +
   theme_map() +
-  labs(title = "Starbucks Locations in the Twin Cities Metro Area")
+  labs(title = "Starbucks Locations in the Twin Cities Metro Area") + 
+  theme(plot.title.position= "plot")
 
 ```
 
@@ -165,7 +167,8 @@ ggmap(world) +
              size = 2,
              color = "navy blue") +
   theme_map() +
-  labs(title = "Starbucks Locations in the Twin Cities Metro Area ~ Watercolor Edition")
+  labs(title = "Starbucks Locations in the Twin Cities Metro Area ~ Watercolor Edition") + 
+  theme(plot.title.position= "plot")
 
 ```
 
@@ -185,7 +188,8 @@ TwinCities <- ggmap(world) +
              alpha = .3, 
              size = 2) +
   theme_map() +
-  labs(title = "Starbucks Locations in the Twin Cities Metro Area")
+  labs(title = "Starbucks Locations in the Twin Cities Metro Area") + 
+  theme(plot.title.position= "plot")
 
 TwinCities + 
   annotate("text", x = -93.17, y = 44.92, label = "Macalester College", color = "blue", size = 3) +
@@ -334,7 +338,8 @@ ggmap(DC_map) +
              color = departures)) +
   theme_map() +
   theme(legend.background = element_blank()) +
-  labs(title = "Visualization of Biking Stations with the Most Departures in DC")
+  labs(title = "Visualization of Biking Stations with the Most Departures in DC") + 
+  theme(plot.title.position= "plot", panel.grid.major = element_blank())
 
 
 ```
@@ -362,7 +367,8 @@ ggmap(DC_map) +
              color = proportion)) +
   theme_map() +
   theme(legend.background = element_blank()) +
-  labs(title = "Visualization of Biking Stations with the Most Casual Rider Departures from Them in DC")
+  labs(title = "Visualization of Biking Stations with the Most Casual Rider Departures from Them in DC")+ 
+  theme(plot.title.position= "plot")
 
 ```
   
@@ -390,7 +396,8 @@ covid19 %>%
            aes(map_id = state, fill = cases)) +
   expand_limits(x = states_map$long, y = states_map$lat) +
   theme_map() +
-  labs(title = "Most Recent Total Cumulative Number of COVID-19 Cases by State in the US")
+  labs(title = "Most Recent Total Cumulative Number of COVID-19 Cases by State in the US")+ 
+  theme(plot.title.position= "plot")
 
 ```
   
@@ -415,7 +422,8 @@ covid19 %>%
            aes(map_id = state, fill = per10k)) +
   expand_limits(x = states_map$long, y = states_map$lat) +
   theme_map() +
-  labs(title = "Most Recent Total Cumulative Number of COVID-19 Cases (per 10,000 people) by State in the US")
+  labs(title = "Most Recent Total Cumulative Number of COVID-19 Cases (per 10,000 people) by State in the US")+ 
+  theme(plot.title.position= "plot")
 
 
 ```  
@@ -467,11 +475,11 @@ MplsStops %>%
   
   16. Save the folder from moodle called Minneapolis_Neighborhoods into your project/repository folder for this assignment. Make sure the folder is called Minneapolis_Neighborhoods. Use the code below to read in the data and make sure to **delete the `eval=FALSE`**. Although it looks like it only links to the .sph file, you need the entire folder of files to create the `mpls_nbhd` data set. These data contain information about the geometries of the Minneapolis neighborhoods. Using the `mpls_nbhd` dataset as the base file, join the `mpls_suspicious` and `MplsDemo` datasets to it by neighborhood (careful, they are named different things in the different files). Call this new dataset `mpls_all`.
 
-```{r, eval=FALSE}
+```{r}
 mpls_nbhd <- st_read("Minneapolis_Neighborhoods/Minneapolis_Neighborhoods.shp", quiet = TRUE)
 ```
 
-```{r, eval=FALSE}
+```{r}
 mpls_all <- mpls_nbhd %>% 
   mutate(neighborhood = BDNAME) %>% 
   full_join(mpls_suspicious, by = "neighborhood") %>% 
