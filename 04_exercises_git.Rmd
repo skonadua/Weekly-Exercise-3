@@ -320,7 +320,7 @@ Stations<-read_csv("http://www.macalester.edu/~dshuman1/data/112/DC-Stations.csv
 DC_map <- get_stamenmap(
   bbox = c(left = -77.31, bottom = 38.733, right = -76.73, top = 39.123),
   maptype = "terrain",
-  zoom = 12)
+  zoom = 11)
 
 NewTrips <- Trips %>% 
   full_join(Stations, by = c("sstation" = "name")) %>%
@@ -346,7 +346,7 @@ ggmap(DC_map) +
 DC_map <- get_stamenmap(
   bbox = c(left = -77.31, bottom = 38.733, right = -76.73, top = 39.123),
   maptype = "terrain",
-  zoom = 12)
+  zoom = 11)
 
 CasualNewTrips <- Trips %>% 
   left_join(Stations, by = c("sstation" = "name")) %>% 
@@ -487,8 +487,10 @@ mpls_all <- mpls_nbhd %>%
 
 pal_mpls2 <- colorFactor("viridis", domain = mpls_all$prop_suspicious)
 
-mpls_all %>% 
-  full_join(MplsStops, by = "neighborhood") %>% 
+mpls_all17 <- mpls_all %>% 
+  full_join(MplsStops, by = "neighborhood") 
+
+mpls_all17 %>% 
   leaflet() %>% 
   addTiles() %>% 
   addCircles(lng = ~long, 
@@ -517,8 +519,7 @@ mpls_all %>%
 
 pal_mpls3 <- colorFactor("viridis", domain = mpls_all$poverty)
 
-mpls_all %>% 
-  full_join(MplsStops, by = "neighborhood") %>% 
+mpls_all17%>% 
   leaflet() %>% 
   addTiles() %>% 
   addCircles(lng = ~long, 
