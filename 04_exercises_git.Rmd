@@ -1,6 +1,6 @@
 ---
 title: 'Weekly Exercises #4'
-author: "Stephanie Konadu-Acheampong"
+author: "Stephanie Konadu-Acheampong (with Cynthia Aguilar & Jennifer Huang)"
 output: 
   html_document:
     keep_md: TRUE
@@ -8,11 +8,13 @@ output:
     toc_float: TRUE
     df_print: paged
     code_download: true
+    code_folding: hide
+    theme: cosmo
 ---
 
 
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE, error=TRUE, message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = TRUE, error=TRUE, message=FALSE, warning=FALSE)
 ```
 
 ```{r libraries}
@@ -112,12 +114,13 @@ ggmap(world) +
              alpha = .3, 
              size = .1) +
   theme_map() + 
-  theme(legend.background = element_blank())
+  theme(legend.background = element_blank()) +
+  labs(title = "Starbucks Locations in the World by Ownership Type")
   
   
 ```
 
-*I can deduce from this that*
+*I can deduce from this that most Starbucks in the world are company owned. This is especially true in the US, which makes sense as the company was founded and is based there. There is a pocket of joint venture domination in East Asia and India as well as a bit in Europe; perhaps this is due to size/space and not being able to have a full building available for Starbucks to set up shop in.*
 
 
 
@@ -134,8 +137,9 @@ ggmap(world) +
   geom_point(data = Starbucks, 
              aes(x = Longitude, y = Latitude), 
              alpha = .3, 
-             size = .1) +
-  theme_map()
+             size = 3) +
+  theme_map() +
+  labs(title = "Starbucks Locations in the Twin Cities Metro Area")
 
 ```
 
@@ -158,8 +162,10 @@ ggmap(world) +
   geom_point(data = Starbucks, 
              aes(x = Longitude, y = Latitude), 
              alpha = .3, 
-             size = .1) +
-  theme_map()
+             size = 2,
+             color = "navy blue") +
+  theme_map() +
+  labs(title = "Starbucks Locations in the Twin Cities Metro Area ~ Watercolor Edition")
 
 ```
 
@@ -177,8 +183,9 @@ TwinCities <- ggmap(world) +
   geom_point(data = Starbucks, 
              aes(x = Longitude, y = Latitude), 
              alpha = .3, 
-             size = 1) +
-  theme_map()
+             size = 2) +
+  theme_map() +
+  labs(title = "Starbucks Locations in the Twin Cities Metro Area")
 
 TwinCities + 
   annotate("text", x = -93.17, y = 44.92, label = "Macalester College", color = "blue", size = 3) +
@@ -207,11 +214,40 @@ starbucks_with_2018_pop_est <-
 
   6. **`dplyr` review**: Look through the code above and describe what each line of code does.
 
+
+*The first line (census_pop...) functions to save the piped information under that name. The second line reads in the data from drop box. The third line separates the variable "state" into "dot" and "state" components and merging any extra information. The fourth line selects for "-dot". The next line makes all under the "state" variable lowercase.*
+*The next section of code begins with "starbucks_with..."and is saving what all is piped beneath it under the name "starbucks..." using the values from the starbucks by US state data in the 2nd line. The third line joins the starbucks by state data with the census population data by the variable "state_name" which was altered from its initial form "state" in the census data (line 4). Finally, in the last line, a new variable is created that calculates how many starbucks are in each state per 10,000 people by dividing the number of starbucks by the population data for each state and multiplying that by 10,000.*
+
+
+  
   7. Create a choropleth map that shows the number of Starbucks per 10,000 people on a map of the US. Use a new fill color, add points for all Starbucks in the US (except Hawaii and Alaska), add an informative title for the plot, and include a caption that says who created the plot (you!). Make a conclusion about what you observe.
   
 ```{r}
+states_map <- map_data("state")
 
+starbucks_with_2018_pop_est %>% 
+  ggplot() +
+  geom_map(map = states_map, 
+           aes(map_id = state_name,
+               fill = starbucks_per_10000)) +
+  labs(title = "Number of Starbucks per 10,000 People by State in the United States", 
+       y = "", 
+       x = "", 
+       caption = "Stephanie Konadu-Acheampong") + 
+  theme(plot.title.position= "plot", panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  expand_limits(x = states_map$long, y = states_map$lat) +
+  scale_fill_viridis_c(option = "plasma")
+  theme_map() +
+    theme(legend.background = element_blank()) 
+    
+
+#can't figure out how to get rid of the grid numbers):
+  
 ```
+
+
+*From this map, it's quite obvious that Starbucks is much more popular on the West coast of the United States (and CO) than anywhere else. This could be because the company was originally founded in Seattle on the West coast and spread to the neighboring states.*
+
 
 ### A few of your favorite things (`leaflet`)
 
@@ -227,13 +263,11 @@ starbucks_with_2018_pop_est <-
 
 ```{r}
 
-#from office hours 
-
 stephs_favs_DK <- tibble(
-  place = c("Konditaget Lüders", "Amalienborg Slotsplads", "The Little Mermaid", "Kultorvet", "Tivoli", "The Black Diamond", "I Am Queen Mary", "Dragør Fort", "Amagerstrand", "Kongens Have & Rosenborg Slot", "Sankt Peders Bageri", "Ny Carlsberg Glyptotek", "Reffen"), #names
-  lat = c(55.707, 55.68, 55.69, 55.6824, 55.673, 55.673, 55.686, 55.587 , 55.657,55.68, 55.679, 55.672, 55.693),
-  long = c(12.59, 12.593, 12.599, 12.5735, 12.553, 12.583, 12.597, 12.677, 12.648, 12.577, 12.569, 12.571, 12.609),
-  top3 = c("yes", "no", "no", "yes", "no", "no", "no", "no", "no", "no", "yes", "no", "no"))
+  place = c("Konditaget Lüders", "Kultorvet", "Kongens Have & Rosenborg Slot", "Sankt Peders Bageri", "Tivoli", "Ny Carlsberg Glyptotek", "The Black Diamond", "Amalienborg Slotsplads", "I Am Queen Mary", "The Little Mermaid", "Dragør Fort", "Amagerstrand",  "Reffen"), #names
+  lat = c(55.707, 55.6824, 55.68, 55.679,55.673, 55.672, 55.673, 55.68, 55.686, 55.69, 55.587 , 55.657,  55.693),
+  long = c(12.59, 12.5735, 12.577, 12.569, 12.553, 12.571, 12.583, 12.593, 12.597, 12.599, 12.677, 12.648, 12.609),
+  top3 = c("yes", "yes", "no", "yes", "no", "no", "no", "no", "no", "no", "no", "no", "no"))
 
 pal_favs <- colorFactor("viridis",
                     domain = stephs_favs_DK$top3)
@@ -253,23 +287,6 @@ leaflet(stephs_favs_DK) %>%
             values = ~top3, 
             opacity = 1)
 
-#errors: 
-# - Error in inherits(values, "formula") : argument "values" is missing, with no default
-# - path too long again 
-
-
-# MplsStops %>% 
-#   leaflet() %>% 
-#   addTiles() %>% 
-#   addCircles(lng = ~long, 
-#              lat = ~lat,
-#              weight = 1,
-#              opacity = 1, 
-#              color = ~pal_mpls(problem)) %>% 
-#   addLegend(position = c("topright"), 
-#             pal = pal_mpls, 
-#             values = ~problem, 
-#             opacity = 1)
 
 ```
 
@@ -300,21 +317,25 @@ Stations<-read_csv("http://www.macalester.edu/~dshuman1/data/112/DC-Stations.csv
   
 ```{r}
 
-covid19 %>% 
-  mutate(state = str_to_lower(state)) %>% 
-  group_by(state) %>% 
-  summarise(cases = max(cases)) %>% 
-  ggplot() + 
-  geom_map(map = states_map, 
-           aes(map_id = state.abbfill = cases)) +
-  expand_limits(x = states_map$long, y = states_map$lat) +
-  theme_map()
+DC_map <- get_stamenmap(
+  bbox = c(left = -77.31, bottom = 38.733, right = -76.73, top = 39.123),
+  maptype = "terrain",
+  zoom = 12)
 
-# DC_map <- get_stamenmap(
-#   bbox = c(left = -77.31, bottom = 38.733, right = -76.73, top = 39.0539), 
-#   maptype = "terrain",
-#   zoom = 11)
-# )
+NewTrips <- Trips %>% 
+  full_join(Stations, by = c("sstation" = "name")) %>%
+  group_by(lat,long, sstation) %>% 
+  mutate(departures = n())
+
+ggmap(DC_map) +
+  geom_point(data = NewTrips, 
+             aes(y = lat, 
+                 x = long, 
+             color = departures)) +
+  theme_map() +
+  theme(legend.background = element_blank()) +
+  labs(title = "Visualization of Biking Stations with the Most Departures in DC")
+
 
 ```
   
@@ -322,9 +343,33 @@ covid19 %>%
   
 ```{r}
 
+DC_map <- get_stamenmap(
+  bbox = c(left = -77.31, bottom = 38.733, right = -76.73, top = 39.123),
+  maptype = "terrain",
+  zoom = 12)
 
+CasualNewTrips <- Trips %>% 
+  left_join(Stations, by = c("sstation" = "name")) %>% 
+  mutate(casual = client == "Casual") %>% 
+  group_by(lat, long, sstation) %>% 
+  summarize(departures = n(), totalcasual = sum(casual)) %>% 
+  mutate(proportion = totalcasual / departures)
+
+ggmap(DC_map) +
+  geom_point(data = CasualNewTrips, 
+             aes(y = lat, 
+                 x = long, 
+             color = proportion)) +
+  theme_map() +
+  theme(legend.background = element_blank()) +
+  labs(title = "Visualization of Biking Stations with the Most Casual Rider Departures from Them in DC")
 
 ```
+  
+  
+  *The highest proportion of casual riders seems to be around the mouth of whatever body of water is on the map. Maybe there are a lot of waterfront restaurants and sites that tourists like to see or people like to start riding at the top of the lake/river*
+  
+  
   
 ### COVID-19 data
 
@@ -334,27 +379,44 @@ The following exercises will use the COVID-19 data from the NYT.
   
 ```{r}
 
+states_map <- map_data("state")
 
+covid19 %>% 
+  mutate(state = str_to_lower(state)) %>% 
+  group_by(state) %>% 
+  summarise(cases = max(cases)) %>% 
+  ggplot() + 
+  geom_map(map = states_map, 
+           aes(map_id = state, fill = cases)) +
+  expand_limits(x = states_map$long, y = states_map$lat) +
+  theme_map() +
+  labs(title = "Most Recent Total Cumulative Number of COVID-19 Cases by State in the US")
 
 ```
+  
+  *This map isn't helpful because it's really only highlighting Texas and California (and arguably NY, Illinois, and Florida) as having a high cumulative number of cases. While this is true, this is because those states already have large populations and thus, it's a given that they'd have a larger cumulative number of cases. States with lower populations appear to be doing better, but in reality, they just have less cases shown on the map because their populations are smaller.*
+  
   
   12. Now add the population of each state to the dataset and color the states by most recent cumulative cases/10,000 people. See the code for doing this with the Starbucks data. You will need to make some modifications. 
   
 ```{r}
 
-covid_cum <-
-  covid19 %>% 
-  mutate(new_state = str_to_lower(state)) %>% 
-  left_join(census_pop_est_2018, by = c("new_state" = "state")) %>% 
-  mutate(per10 = (cases/est_pop_2018)*10000)
-
 states_map <- map_data("state")
 
-covid_cum %>% 
-  ggplot()
+covid19 %>% 
+  mutate(state = str_to_lower(state)) %>% 
+  group_by(state) %>% 
+  summarise(cases = max(cases)) %>% 
+  left_join(census_pop_est_2018, 
+            by = c("state")) %>% 
+  mutate(per10k = (cases/est_pop_2018)*10000) %>% 
+  ggplot() + 
+  geom_map(map = states_map, 
+           aes(map_id = state, fill = per10k)) +
+  expand_limits(x = states_map$long, y = states_map$lat) +
+  theme_map() +
+  labs(title = "Most Recent Total Cumulative Number of COVID-19 Cases (per 10,000 people) by State in the US")
 
-#change state name to lowercase
-#summarize covid data and then join
 
 ```  
   
@@ -369,12 +431,12 @@ These exercises use the datasets `MplsStops` and `MplsDemo` from the `carData` l
   
 ```{r}
 
-MplsStops %>% 
+mpls_suspicious <- MplsStops %>% 
   mutate(num_sus = problem %in% c("suspicious")) %>% 
   group_by(neighborhood) %>% 
   summarise(stopnumber = n(),
             prop_sus = mean(num_sus)) %>% 
-  mutate(prop_suspicious = prop_sus)
+  mutate(prop_suspicious = prop_sus) 
 
 ```
   
@@ -396,7 +458,9 @@ MplsStops %>%
   addLegend(position = c("topright"), 
             pal = pal_mpls, 
             values = ~problem, 
-            opacity = 1)
+            opacity = 1) 
+
+#how to add a title to leaflet maps ~ labs unavailable
 
 ```
   
@@ -407,54 +471,66 @@ MplsStops %>%
 mpls_nbhd <- st_read("Minneapolis_Neighborhoods/Minneapolis_Neighborhoods.shp", quiet = TRUE)
 ```
 
+```{r, eval=FALSE}
+mpls_all <- mpls_nbhd %>% 
+  mutate(neighborhood = BDNAME) %>% 
+  full_join(mpls_suspicious, by = "neighborhood") %>% 
+  full_join(MplsDemo, by = "neighborhood")
+  
+```
+
+
+
   17. Use `leaflet` to create a map from the `mpls_all` data  that colors the neighborhoods by `prop_suspicious`. Display the neighborhood name as you scroll over it. Describe what you observe in the map.
 
 ```{r}
 
-pal_mpls2 <- colorFactor("viridis", domain = MplsStops$prop_suspicious)
+pal_mpls2 <- colorFactor("viridis", domain = mpls_all$prop_suspicious)
 
-MplsProp <- MplsStops %>% 
-  mutate(num_sus = problem %in% c("suspicious")) %>% 
-  group_by(neighborhood) %>% 
-  summarise(stopnumber = n(),
-            prop_sus = mean(num_sus)) %>% 
-  mutate(prop_suspicious = prop_sus)
-
-MplsStops %>% 
-  left_join(MplsProp, by = c("neighborhood")) %>% 
+mpls_all %>% 
+  full_join(MplsStops, by = "neighborhood") %>% 
   leaflet() %>% 
   addTiles() %>% 
   addCircles(lng = ~long, 
              lat = ~lat,
+             label = ~neighborhood,
              weight = 1,
              opacity = 1, 
-             color = ~pal_mpls(prop_suspicious)) %>% 
+             color = ~pal_mpls2(prop_suspicious)) %>% 
   addLegend(position = c("topright"), 
-            pal = pal_mpls, 
+            pal = pal_mpls2, 
             values = ~prop_suspicious, 
+            title = "Prop of Crimes Suspicious",
             opacity = 1)
 
-#work on her (,: )
 
 ```
 
   18. Use `leaflet` to create a map of your own choosing. Come up with a question you want to try to answer and use the map to help answer that question. Describe what your map shows. 
   
+  
+  **Question: Does poverty level correspond with the proportion of suspicious stops in the various MPLS neighborhoods?** 
+  *I'd like to create a map that  colors the neighborhoods by poverty, so I can try to see if the poverty level of the area corresponds with a higher frequency of 'suspicious' stops that was shown by the prior map*
+  
+  
 ```{r}
 
-pal_mpls <- colorFactor("viridis", domain = MplsStops$problem)
+pal_mpls3 <- colorFactor("viridis", domain = mpls_all$poverty)
 
-MplsStops %>% 
+mpls_all %>% 
+  full_join(MplsStops, by = "neighborhood") %>% 
   leaflet() %>% 
   addTiles() %>% 
   addCircles(lng = ~long, 
              lat = ~lat,
+             label = ~neighborhood,
              weight = 1,
              opacity = 1, 
-             color = ~pal_mpls(problem)) %>% 
+             color = ~pal_mpls3(poverty)) %>% 
   addLegend(position = c("topright"), 
-            pal = pal_mpls, 
-            values = ~problem, 
+            pal = pal_mpls3, 
+            values = ~poverty, 
+            title = "Prop. Pop. in Poverty",
             opacity = 1)
 
 ```
